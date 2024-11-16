@@ -16,7 +16,9 @@ import {Address} from "solidity-utils/contracts/libraries/AddressLib.sol";
 import {IEscrow} from "../lib/cross-chain-swap/contracts/interfaces/IEscrow.sol";
 import {ImmutablesLib} from "../lib/cross-chain-swap/contracts/libraries/ImmutablesLib.sol";
 // import {CrossChainHook} from "crosschain-pool/CrossChainHook.sol";
-
+interface ICrossChainHook {
+     function swap(address, PoolKey calldata, IPoolManager.SwapParams calldata, BalanceDelta) external;
+}
 /**
  * @title Sample implementation of a Resolver contract for cross-chain swap.
  * @dev It is important when deploying an escrow on the source chain to send the safety deposit and deploy the escrow in the same
