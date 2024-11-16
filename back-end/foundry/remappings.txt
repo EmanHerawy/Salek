@@ -1,0 +1,7 @@
+ds-test/=lib/forge-std/lib/ds-test/src/
+forge-std/=lib/forge-std/src/
+@chainlink/contracts/=node_modules/@chainlink/contracts
+@chainlink/contracts-ccip/=node_modules/@chainlink/contracts-ccip/
+@chainlink/local/=node_modules/@chainlink/local/
+@uniswap/v4-core/=lib/v4-periphery/lib/v4-core/
+

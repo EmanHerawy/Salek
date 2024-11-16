@@ -8,9 +8,7 @@ optimizer = true
 optimizer_runs = 800
 via_ir = false
 ffi = true
-remappings = [
-  '@chainlink/contracts-ccip/=node_modules/@chainlink/contracts-ccip/'
-]
+
 
 fs_permissions = [{ access = "read-write", path = "./" }]
 

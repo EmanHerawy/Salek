@@ -39,7 +39,7 @@ contract CrossChainHook is BaseHook {
             afterInitialize: false,
             beforeAddLiquidity: false,
             beforeRemoveLiquidity: false,
-            afterAddLiquidity: true,
+            afterAddLiquidity: false,
             afterRemoveLiquidity: false,
             beforeSwap: false,
             afterSwap: true,
@@ -66,7 +66,7 @@ contract CrossChainHook is BaseHook {
 
         // Extract user address from hookData
         (address receiver, uint64 chainSelector) = abi.decode(hookData, (address, uint64));
-        address tokenToSwap = swapParams.zeroForOne ? Currency.unwrap(key.currency0) : Currency.unwrap(key.currency1);
+        address tokenToSwap = swapParams.zeroForOne ? Currency.unwrap(key.currency1) : Currency.unwrap(key.currency0);
         uint256 amountToSwap =
             swapParams.zeroForOne ? uint256(int256(-delta.amount0())) : uint256(int256(-delta.amount1()));
         _swapCrossChain(
@@ -103,22 +103,21 @@ contract CrossChainHook is BaseHook {
 
         // Set the token and amount to transfer
         message.tokenAmounts[0] = Client.EVMTokenAmount({token: tokenAddress, amount: amount});
+        //  if (feeTokenAddress == address(0)) {
+        //             // Pay fees with native token
 
+        //         }
         // Approve the router to transfer tokens on behalf of the sender
         ERC20(tokenAddress).approve(router, amount);
 
         // Estimate the fees required for the transfer
         uint256 fees = routerContract.getFee(destinationChainSelector, message);
+        // TODO : use chainlink price to get the price of the token and calculate the fees
+         poolManager.take(Currency.wrap(tokenAddress), address(this), fees);
+
+        message.tokenAmounts[0] = Client.EVMTokenAmount({token: tokenAddress, amount: amount - fees});
 
         // Send the CCIP message and handle fee payment
-        bytes32 messageId;
-        if (feeTokenAddress == address(0)) {
-            // Pay fees with native token
-            messageId = routerContract.ccipSend{value: fees}(destinationChainSelector, message);
-        } else {
-            // Approve the router to spend LINK tokens for fees
-            ERC20(feeTokenAddress).approve(router, fees);
-            messageId = routerContract.ccipSend(destinationChainSelector, message);
-        }
+        bytes32 messageId = routerContract.ccipSend(destinationChainSelector, message);
     }
 }
