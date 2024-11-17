@@ -48,7 +48,6 @@ contract CustomResolver is Ownable {
      * @notice See {IResolverExample-deploySrc}.
      */
     function deploySrc(
-        address hook,
         IBaseEscrow.Immutables calldata immutables,
         IOrderMixin.Order calldata order,
         bytes32 r,

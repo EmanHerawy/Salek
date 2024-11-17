@@ -23,8 +23,8 @@ contract DeployToken is Script {
         uint256 initialSupply = HelperUtils.getUintFromJson(vm, configPath, ".BnMToken.initialSupply");
         bool withGetCCIPAdmin = HelperUtils.getBoolFromJson(vm, configPath, ".BnMToken.withGetCCIPAdmin");
         address ccipAdminAddress = HelperUtils.getAddressFromJson(vm, configPath, ".BnMToken.ccipAdminAddress");
-
-        vm.startBroadcast();
+  uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
 
         address deployer = msg.sender;
         address tokenAddress;

@@ -17,3 +17,6 @@ avalanche-fuji = { key = "${ETHERSCAN_API_KEY}", chain = 43113, url = "https://a
 arbitrum-sepolia = { key = "${ARBISCAN_API_KEY}", chain = 421613, url = "https://api-sepolia.arbiscan.io/api" }
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+[rpc_endpoints]
+arbChain = "${RPC_URL_ARBITRUM_SEPOLIA}"
+sepolia="${RPC_URL_ETH_SEPOLIA}"

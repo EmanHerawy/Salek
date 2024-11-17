@@ -1,3 +1,6 @@
 [submodule "ccip/foundry/lib/v4-periphery"]
 	path = ccip/foundry/lib/v4-periphery
 	url = https://github.com/Uniswap/v4-periphery
+[submodule "back-end/1InchFusion/contracts/lib/v4-periphery"]
+	path = back-end/1InchFusion/contracts/lib/v4-periphery
+	url = https://github.com/Uniswap/v4-periphery

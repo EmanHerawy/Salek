@@ -18,8 +18,8 @@ contract DeployLockReleaseTokenPool is Script {
         string memory deployedTokenPath = string.concat(root, "/script/output/deployedToken_", chainName, ".json");
 
         // Extract the deployed token address from the JSON file
-        address tokenAddress =
-            HelperUtils.getAddressFromJson(vm, deployedTokenPath, string.concat(".deployedToken_", chainName));
+        address tokenAddress = 0x6c1B0Edb80Fd56b598634d0Fd3bdd49b7420BBe2; //sepolia
+           // HelperUtils.getAddressFromJson(vm, deployedTokenPath, string.concat(".deployedToken_", chainName));
 
         // Fetch network configuration (router and RMN proxy addresses)
         HelperConfig helperConfig = new HelperConfig();
@@ -31,8 +31,9 @@ contract DeployLockReleaseTokenPool is Script {
 
         // Cast the token address to the IBurnMintERC20 interface
         IBurnMintERC20 token = IBurnMintERC20(tokenAddress);
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-        vm.startBroadcast();
+        vm.startBroadcast(deployerPrivateKey);
 
         // Deploy the LockReleaseTokenPool contract associated with the token
         LockReleaseTokenPool tokenPool = new LockReleaseTokenPool(

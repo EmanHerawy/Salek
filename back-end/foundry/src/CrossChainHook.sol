@@ -20,13 +20,13 @@ contract CrossChainHook is BaseHook {
     using CurrencyLibrary for Currency;
     using BalanceDeltaLibrary for BalanceDelta;
 
-    ERC20 public salekToken;
+    // ERC20 public salekToken;
     address public router;
     address public linkToken;
     // Initialize BaseHook and ERC20
 
     constructor(IPoolManager _manager, address _salekAddress, address _router, address _linkToken) BaseHook(_manager) {
-        salekToken = ERC20(_salekAddress);
+        // salekToken = ERC20(_salekAddress);
         router = _router;
         linkToken = _linkToken;
     }

@@ -7,6 +7,7 @@
     "lint": "eslint  \"tests/**/*.ts\""
   },
   "devDependencies": {
+    "@chainlink/contracts-ccip": "^1.5.0",
     "@1inch/eslint-config": "3",
     "@1inch/tsconfig": "1.0.7",
     "@eslint/compat": "1.1.0",
