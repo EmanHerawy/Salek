@@ -56,6 +56,9 @@ contract Example01Test is Test, Deployers {
             address(flags)
         );
 
+
+
+
         // Deploy our hook
         hook = CrossChainHook(address(flags));
         // hook = new CrossChainHook(IPoolManager(poolManagerAddress), address(ccipBnMToken), address(router), address(linkToken));
