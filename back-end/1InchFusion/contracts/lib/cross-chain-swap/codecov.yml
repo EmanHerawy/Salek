@@ -1,4 +1,0 @@
-ignore:
-  - "test"
-  - "contracts/mocks"
-  - "script"
