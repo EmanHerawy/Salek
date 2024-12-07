@@ -1,33 +1,20 @@
 # Salek
+Our cross-chain DeFi solution enables seamless token swaps through two key components. The front-end mini app provides a user-friendly interface for specifying source and destination tokens and swap amounts (TO BE ADDED). It integrates with the 1inch Fusion API for optimal routing, MEV protection, real-time price impact, and gas fee estimates across chains.
 
-        address salekToken=0x6c1B0Edb80Fd56b598634d0Fd3bdd49b7420BBe2;//0x65c13B01BC11Aa746Cae8397E3fF3D9fa33117c1;
-        vm.startBroadcast(deployerPrivateKey);
-       uint160 flags = uint160(Hooks.AFTER_SWAP_FLAG);
-    //        deployCodeTo(
-    //         "CrossChainHook.sol",
-    //         abi.encode(poolManagerAddress, salekToken, router, linkToken),
-    //         address(flags)
-    //     );
+The system's backbone is a robust smart contract infrastructure utilizing Uniswap v4 and Chainlink's CCIP. When a swap is initiated, source tokens are locked, and a secure cross-chain message with swap details is sent via CCIP to the destination chain. There, smart contracts execute the swap using Uniswap v4’s advanced routing and liquidity features.
 
-    address  CREATE2_DEPLOYER = address(0x4e59b44847b379578588920cA78FbF26c0B4956C);
-    address SEPOLIA_POOLMANAGER = address(0xFf34e285F8ED393E366046153e3C16484A4dD674);
-
-
-        // Mine a salt that will produce a hook address with the correct flags
-        (address hookAddress, bytes32 salt) =
-            HookMiner.find(CREATE2_DEPLOYER, flags, type(CrossChainHook).creationCode, abi.encode(address(SEPOLIA_POOLMANAGER),address(salekToken), address(router), address(linkToken)));
+How it's Made
+Backend: Engineered smart contracts utilizing Uniswap v4's hooks for custom swap logic and Chainlink's CCIP for secure cross-chain messaging. The contracts handle token locking on source chains, cross-chain message transmission, and swap execution on destination chains. Key technical integrations
 
 
 
+## Test 
+```bash
+forge test --fork-url  https://eth-sepolia.g.alchemy.com/v2/your-api-key
+```
+## Deployed contract 
 
-    uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address poolManagerAddress =0x5C038EE8AB7bD7699037E277874F1c611aD0C28F; // arbitrum
+```Json
+  "deployCCIPHook_ethereumSepolia": "0x2c3548Be128338a13274896B4F7c03C7d3D24040"
 
-        address salekToken=0x65c13B01BC11Aa746Cae8397E3fF3D9fa33117c1;
-        vm.startBroadcast(deployerPrivateKey);
-       uint160 flags = uint160(Hooks.AFTER_SWAP_FLAG);
-           deployCodeTo(
-            "CrossChainHook.sol",
-            abi.encode(address(poolManagerAddress), address(salekToken), address(router), address(linkToken)),
-            address(flags)
-        );
+```

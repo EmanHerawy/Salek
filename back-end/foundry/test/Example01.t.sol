@@ -17,14 +17,14 @@ import {CurrencyLibrary, Currency} from "v4-core/types/Currency.sol";
 import {LockReleaseTokenPool} from "@chainlink/contracts-ccip/src/v0.8/ccip/pools/LockReleaseTokenPool.sol";
 
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
-import {CrossChainHook} from "../src/CrossChainHook.sol";
+import {SwapThenCrossChain} from "../src/SwapThenCrossChain.sol";
 import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
 import {PoolManager} from "v4-core/PoolManager.sol";
 import {BurnMintERC677WithCCIPAdmin} from "../src/BurnMintERC677WithCCIPAdmin.sol";
 
 contract Example01Test is Test, Deployers {
     CCIPLocalSimulator public ccipLocalSimulator;
-    CrossChainHook public hook;
+    SwapThenCrossChain public hook;
     address alice;
     address bob;
     IRouterClient router;
@@ -36,7 +36,7 @@ contract Example01Test is Test, Deployers {
 
     function setUp() public {
         ccipLocalSimulator = new CCIPLocalSimulator();
-          deployFreshManagerAndRouters();
+        deployFreshManagerAndRouters();
         (uint64 chainSelector, IRouterClient sourceRouter,,, LinkToken link, BurnMintERC677Helper ccipBnM,) =
             ccipLocalSimulator.configuration();
         alice = makeAddr("alice");
@@ -51,21 +51,17 @@ contract Example01Test is Test, Deployers {
         // Deploy hook to an address that has the proper flags set
         uint160 flags = uint160(Hooks.AFTER_SWAP_FLAG);
         deployCodeTo(
-            "CrossChainHook.sol",
+            "SwapThenCrossChain.sol",
             abi.encode(manager, address(ccipBnMToken), address(router), address(linkToken)),
             address(flags)
         );
 
-
-
-
         // Deploy our hook
-        hook = CrossChainHook(address(flags));
-        // hook = new CrossChainHook(IPoolManager(poolManagerAddress), address(ccipBnMToken), address(router), address(linkToken));
+        hook = SwapThenCrossChain(address(flags));
+        // hook = new SwapThenCrossChain(IPoolManager(poolManagerAddress), address(ccipBnMToken), address(router), address(linkToken));
 
         // Approve our TOKEN for spending on the swap router and modify liquidity router
         // These variables are coming from the `Deployers` contract
- 
     }
 
     function prepareScenario()
@@ -77,8 +73,8 @@ contract Example01Test is Test, Deployers {
         ccipBnMToken.drip(alice);
         vm.deal(alice, 1 ether);
         amountToSend = 10 ether;
-       ccipBnMToken.approve(address(swapRouter), type(uint256).max);
-       ccipBnMToken.approve(address(modifyLiquidityRouter), type(uint256).max);
+        ccipBnMToken.approve(address(swapRouter), type(uint256).max);
+        ccipBnMToken.approve(address(modifyLiquidityRouter), type(uint256).max);
         ccipBnMToken.approve(address(router), amountToSend);
 
         // Initialize a pool
@@ -120,16 +116,12 @@ contract Example01Test is Test, Deployers {
         uint256 balanceOfBobBefore = ccipBnMToken.balanceOf(bob);
 
         vm.startPrank(alice);
-        
+
         vm.stopPrank();
 
         uint256 balanceOfAliceAfter = ccipBnMToken.balanceOf(alice);
         uint256 balanceOfBobAfter = ccipBnMToken.balanceOf(bob);
 
         // TODO , read balance in destination chain
-        
-       
     }
-
- 
 }

@@ -19,7 +19,7 @@ contract DeployLockReleaseTokenPool is Script {
 
         // Extract the deployed token address from the JSON file
         address tokenAddress = 0x6c1B0Edb80Fd56b598634d0Fd3bdd49b7420BBe2; //sepolia
-           // HelperUtils.getAddressFromJson(vm, deployedTokenPath, string.concat(".deployedToken_", chainName));
+            // HelperUtils.getAddressFromJson(vm, deployedTokenPath, string.concat(".deployedToken_", chainName));
 
         // Fetch network configuration (router and RMN proxy addresses)
         HelperConfig helperConfig = new HelperConfig();

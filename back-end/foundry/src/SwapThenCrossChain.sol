@@ -12,8 +12,9 @@ import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {Hooks} from "v4-core/libraries/Hooks.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
-contract CrossChainHook is BaseHook {
+contract SwapThenCrossChain is BaseHook {
     // Use CurrencyLibrary and BalanceDeltaLibrary
     // to add some helper functions over the Currency and BalanceDelta
     // data types
@@ -25,14 +26,49 @@ contract CrossChainHook is BaseHook {
     address public linkToken;
     // Initialize BaseHook and ERC20
 
+    // chainlink price feed
+    AggregatorV3Interface internal dataFeed;
+
     constructor(IPoolManager _manager, address _salekAddress, address _router, address _linkToken) BaseHook(_manager) {
         // salekToken = ERC20(_salekAddress);
         router = _router;
         linkToken = _linkToken;
+
+        /**
+         * Network: Sepolia
+         * Data Feed: LINK / ETH
+         * Address: 0x42585eD362B3f1BCa95c640FdFf35Ef899212734
+         */
+        dataFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
     }
 
+    function calculateLinkFeesInEth(uint256 feesInLink) public returns (int256) {
+        // Get the latest price
+        int256 price = getChainlinkDataFeedLatestAnswer();
+        // Calculate link price in eth
+        return int256(feesInLink) / price;
+    }
+
+    /**
+     * Returns the latest answer.
+     */
+    function getChainlinkDataFeedLatestAnswer() public view returns (int256) {
+        // prettier-ignore
+        (
+            /* uint80 roundID */
+            ,
+            int256 answer,
+            /*uint startedAt*/
+            ,
+            /*uint timeStamp*/
+            ,
+            /*uint80 answeredInRound*/
+        ) = dataFeed.latestRoundData();
+        return answer;
+    }
     // Set up hook permissions to return `true`
     // for the two hook functions we are using
+
     function getHookPermissions() public pure override returns (Hooks.Permissions memory) {
         return Hooks.Permissions({
             beforeInitialize: false,
@@ -113,7 +149,8 @@ contract CrossChainHook is BaseHook {
         // Estimate the fees required for the transfer
         uint256 fees = routerContract.getFee(destinationChainSelector, message);
         // TODO : use chainlink price to get the price of the token and calculate the fees
-         poolManager.take(Currency.wrap(tokenAddress), address(this), fees);
+        uint256 feesInEther = uint256(calculateLinkFeesInEth(fees));
+        poolManager.take(Currency.wrap(tokenAddress), address(this), fees);
 
         message.tokenAmounts[0] = Client.EVMTokenAmount({token: tokenAddress, amount: amount - fees});
 

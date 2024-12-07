@@ -32,7 +32,7 @@ contract DeployBurnMintTokenPool is Script {
         // Cast the token address to the IBurnMintERC20 interface
         IBurnMintERC20 token = IBurnMintERC20(tokenAddress);
 
-   uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
         vm.startBroadcast(deployerPrivateKey);
         // Deploy the BurnMintTokenPool contract associated with the token

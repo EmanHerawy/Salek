@@ -6,7 +6,7 @@ import {HelperUtils} from "./utils/HelperUtils.s.sol"; // Utility functions for 
 import {HelperConfig} from "./HelperConfig.s.sol"; // Network configuration helper
 import {BurnMintERC677WithCCIPAdmin} from "../src/BurnMintERC677WithCCIPAdmin.sol";
 import {BurnMintERC677} from "@chainlink/contracts-ccip/src/v0.8/shared/token/ERC677/BurnMintERC677.sol";
-import {CrossChainHook} from "../src/CrossChainHook.sol";
+import {SwapThenCrossChain} from "../src/SwapThenCrossChain.sol";
 import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
 import {PoolManager} from "v4-core/PoolManager.sol";
 import {Hooks} from "v4-core/libraries/Hooks.sol";
@@ -19,37 +19,22 @@ contract DeployCCIPHook is Script {
         HelperConfig helperConfig = new HelperConfig();
         (, address router,,,, address linkToken,,) = helperConfig.activeNetworkConfig();
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address poolManagerAddress =0x5C038EE8AB7bD7699037E277874F1c611aD0C28F; // arbitrum
+        address poolManagerAddress = 0x5C038EE8AB7bD7699037E277874F1c611aD0C28F; // arbitrum
 
-               address salekToken=0x6c1B0Edb80Fd56b598634d0Fd3bdd49b7420BBe2;//0x65c13B01BC11Aa746Cae8397E3fF3D9fa33117c1;
+        address salekToken = 0x6c1B0Edb80Fd56b598634d0Fd3bdd49b7420BBe2; //0x65c13B01BC11Aa746Cae8397E3fF3D9fa33117c1;
         vm.startBroadcast(deployerPrivateKey);
-       uint160 flags = uint160(Hooks.AFTER_SWAP_FLAG);
-    //        deployCodeTo(
-    //         "CrossChainHook.sol",
-    //         abi.encode(poolManagerAddress, salekToken, router, linkToken),
-    //         address(flags)
-    //     );
+        uint160 flags = uint160(Hooks.AFTER_SWAP_FLAG);
 
-    address  CREATE2_DEPLOYER = address(0x4e59b44847b379578588920cA78FbF26c0B4956C);
-    address SEPOLIA_POOLMANAGER = address(0xFf34e285F8ED393E366046153e3C16484A4dD674);
-
+        address CREATE2_DEPLOYER = address(0x4e59b44847b379578588920cA78FbF26c0B4956C);
+        address SEPOLIA_POOLMANAGER = address(0xFf34e285F8ED393E366046153e3C16484A4dD674);
 
         // Mine a salt that will produce a hook address with the correct flags
-        (address hookAddress, bytes32 salt) =
-            HookMiner.find(CREATE2_DEPLOYER, flags, type(CrossChainHook).creationCode, abi.encode(address(SEPOLIA_POOLMANAGER),address(salekToken), address(router), address(linkToken)));
-
-
-//         // Mine a salt that will produce a hook address with the correct flags
-//         (address hookAddress, bytes32 salt) =
-//             HookMiner.find(CREATE2_DEPLOYER, flags, type(GasPriceFeesHook).creationCode, abi.encode(address(SEPOLIA_POOLMANAGER)));
-
-        /**
-         * IPoolManager _manager,
-         *     address _salekAddress,
-         *     address _router,
-         *     address _linkToken
-         */
-        // CrossChainHook ccipHook = new CrossChainHook(IPoolManager(poolManagerAddress), salekToken, router, linkToken);
+        (address hookAddress, bytes32 salt) = HookMiner.find(
+            CREATE2_DEPLOYER,
+            flags,
+            type(SwapThenCrossChain).creationCode,
+            abi.encode(address(SEPOLIA_POOLMANAGER), address(salekToken), address(router), address(linkToken))
+        );
         vm.stopBroadcast();
 
         // Prepare to write the deployed token address to a JSON file
@@ -64,7 +49,6 @@ contract DeployCCIPHook is Script {
         // Write the JSON file containing the deployed token address
         vm.writeJson(finalJson, fileName);
     }
-
 
     function deployCodeTo(string memory what, address where) internal virtual {
         deployCodeTo(what, "", 0, where);
